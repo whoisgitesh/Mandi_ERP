@@ -1,0 +1,16 @@
+ALTER TABLE item_ledger_entries
+  ADD COLUMN IF NOT EXISTS document_type varchar(50),
+  ADD COLUMN IF NOT EXISTS description text,
+  ADD COLUMN IF NOT EXISTS variant_code varchar(50),
+  ADD COLUMN IF NOT EXISTS unit_of_measure_code varchar(50),
+  ADD COLUMN IF NOT EXISTS invoiced_quantity numeric DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS unit_price numeric DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS sales_amount numeric DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS vendor_no varchar(50),
+  ADD COLUMN IF NOT EXISTS vendor_name varchar(255),
+  ADD COLUMN IF NOT EXISTS customer_no varchar(50),
+  ADD COLUMN IF NOT EXISTS customer_name varchar(255),
+  ADD COLUMN IF NOT EXISTS open boolean DEFAULT true,
+  ADD COLUMN IF NOT EXISTS source_table varchar(80),
+  ADD COLUMN IF NOT EXISTS source_id integer,
+  ADD COLUMN IF NOT EXISTS source_line_id integer;
