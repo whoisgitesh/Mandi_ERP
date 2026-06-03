@@ -566,7 +566,7 @@ const PORT =
   5000;
 
 app.listen(
-  PORT,
+  PORT,"0.0.0.0",
   () => {
 
     console.log(

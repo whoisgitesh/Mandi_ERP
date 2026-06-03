@@ -14,9 +14,13 @@ const migrations = [
 
   "enterprise_migration_v2.sql",
 
+  "transaction_tables_fix.sql",
+
   "add_inward_gate_bc_quantity_fields.sql",
 
   "add_no_series_relationships.sql",
+
+  "add_purchase_invoice_flow.sql",
 
   "add_purchase_order_invoice_quantities.sql",
 
@@ -29,6 +33,8 @@ const migrations = [
   "add_vendor_ledger_tds_reference_amounts.sql",
 
   "add_purchase_value_flow_fields.sql",
+
+  "add_sales_invoice_posting_flow.sql",
 
   "add_sales_value_flow_fields.sql",
 
