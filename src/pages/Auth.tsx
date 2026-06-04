@@ -251,13 +251,14 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Warehouse } from "lucide-react";
+import { ArrowLeft, Warehouse } from "lucide-react";
 import { API_BASE_URL } from "@/lib/api";
 
 export default function Auth() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
+  const [mode, setMode] = useState<"auth" | "forgot" | "otp" | "reset">("auth");
 
   const navigate = useNavigate();
 
@@ -337,6 +338,101 @@ export default function Auth() {
     setBusy(false);
   };
 
+  // ---------------- SEND OTP ----------------
+  const sendOtp = async () => {
+    if (!email) {
+      toast.error("Enter email first");
+      return;
+    }
+
+    setBusy(true);
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/auth/send-otp`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        toast.success("OTP sent");
+        setMode("otp");
+      } else {
+        toast.error(data.error || "Failed to send OTP");
+      }
+    } catch {
+      toast.error("Server error");
+    }
+
+    setBusy(false);
+  };
+
+  // ---------------- VERIFY OTP ----------------
+  const verifyOtp = async () => {
+    if (!otp) {
+      toast.error("Enter OTP");
+      return;
+    }
+
+    setBusy(true);
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/auth/verify-otp`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, otp }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        toast.success("OTP verified");
+        setMode("reset");
+      } else {
+        toast.error(data.error || "Invalid OTP");
+      }
+    } catch {
+      toast.error("Server error");
+    }
+
+    setBusy(false);
+  };
+
+  // ---------------- RESET PASSWORD ----------------
+  const resetPassword = async () => {
+    if (!newPassword) {
+      toast.error("Enter new password");
+      return;
+    }
+
+    setBusy(true);
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/auth/reset-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, newPassword }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        toast.success("Password updated");
+        setOtp("");
+        setNewPassword("");
+        setMode("auth");
+      } else {
+        toast.error(data.error || "Failed to reset password");
+      }
+    } catch {
+      toast.error("Server error");
+    }
+
+    setBusy(false);
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-muted px-4">
       <Card className="w-full max-w-md shadow-lg">
@@ -350,7 +446,87 @@ export default function Auth() {
         </CardHeader>
 
         <CardContent>
-          <Tabs defaultValue="signin">
+          {mode !== "auth" ? (
+            <div className="space-y-4">
+              <div className="text-center">
+                <h2 className="text-base font-semibold">
+                  {mode === "forgot" && "Forgot password?"}
+                  {mode === "otp" && "Verify OTP"}
+                  {mode === "reset" && "Reset password"}
+                </h2>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  {mode === "forgot" && "Enter your email and we'll send you a reset OTP."}
+                  {mode === "otp" && "Enter the OTP sent to your email."}
+                  {mode === "reset" && "Create a new password for your account."}
+                </p>
+              </div>
+
+              {mode === "forgot" && (
+                <>
+                  <div>
+                    <Label>Email</Label>
+                    <Input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                    />
+                  </div>
+
+                  <Button className="w-full" disabled={busy} onClick={sendOtp}>
+                    Send OTP
+                  </Button>
+                </>
+              )}
+
+              {mode === "otp" && (
+                <>
+                  <div>
+                    <Label>OTP</Label>
+                    <Input
+                      value={otp}
+                      onChange={(e) => setOtp(e.target.value)}
+                      required
+                    />
+                  </div>
+
+                  <Button className="w-full" disabled={busy} onClick={verifyOtp}>
+                    Verify OTP
+                  </Button>
+                </>
+              )}
+
+              {mode === "reset" && (
+                <>
+                  <div>
+                    <Label>New Password</Label>
+                    <Input
+                      type="password"
+                      minLength={6}
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      required
+                    />
+                  </div>
+
+                  <Button className="w-full" disabled={busy} onClick={resetPassword}>
+                    Reset Password
+                  </Button>
+                </>
+              )}
+
+              <Button
+                type="button"
+                variant="ghost"
+                className="mx-auto flex"
+                onClick={() => setMode("auth")}
+              >
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back to login
+              </Button>
+            </div>
+          ) : (
+            <Tabs defaultValue="signin">
 
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="signin">Sign in</TabsTrigger>
@@ -385,7 +561,7 @@ export default function Auth() {
                   <button
                     type="button"
                     className="text-sm text-primary"
-                    onClick={() => navigate("/forgot-password")}
+                    onClick={() => setMode("forgot")}
                   >
                     Forgot password?
                   </button>
@@ -430,7 +606,8 @@ export default function Auth() {
               </form>
             </TabsContent>
 
-          </Tabs>
+            </Tabs>
+          )}
         </CardContent>
       </Card>
     </div>
