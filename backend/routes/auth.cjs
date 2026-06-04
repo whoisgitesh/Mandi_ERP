@@ -224,7 +224,29 @@ router.post("/send-otp", async (req, res) => {
     res.json({ message: "OTP sent" });
   } catch (err) {
     console.error("SEND OTP ERROR:", err);
-    res.status(500).json({ error: "Server error" });
+
+    const message = String(err.message || "");
+    const smtpAuthFailed =
+      err.code === "EAUTH" ||
+      err.responseCode === 535 ||
+      message.toLowerCase().includes("invalid login") ||
+      message.toLowerCase().includes("username and password not accepted");
+
+    if (message.includes("OTP mailer is not configured")) {
+      return res.status(500).json({
+        error: "OTP mailer is not configured on server.",
+      });
+    }
+
+    if (smtpAuthFailed) {
+      return res.status(500).json({
+        error: "OTP email login failed. Check SMTP_USER and SMTP_PASS on Render.",
+      });
+    }
+
+    res.status(500).json({
+      error: "Failed to send OTP email.",
+    });
   }
 });
 
