@@ -244,9 +244,11 @@ router.post("/send-otp", async (req, res) => {
       });
     }
 
-    res.status(500).json({
+    return res.status(500).json({
       error: "Failed to send OTP email.",
+      code: err.code || err.command || err.responseCode || "SMTP_ERROR",
     });
+
   }
 });
 
