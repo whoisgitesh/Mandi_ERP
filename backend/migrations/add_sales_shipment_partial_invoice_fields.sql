@@ -3,6 +3,18 @@ ADD COLUMN IF NOT EXISTS quantity_shipped NUMERIC(12,2) DEFAULT 0,
 ADD COLUMN IF NOT EXISTS quantity_invoiced NUMERIC(12,2) DEFAULT 0,
 ADD COLUMN IF NOT EXISTS qty_to_invoice NUMERIC(12,2) DEFAULT 0;
 
+ALTER TABLE sales_invoice
+ADD COLUMN IF NOT EXISTS source_posted_sales_shipment_id INTEGER;
+
+ALTER TABLE posted_sales_invoices
+ADD COLUMN IF NOT EXISTS source_posted_sales_shipment_id INTEGER;
+
+ALTER TABLE posted_sales_invoice_lines
+ADD COLUMN IF NOT EXISTS source_shipment_line_no INTEGER,
+ADD COLUMN IF NOT EXISTS shipment_line_no INTEGER,
+ADD COLUMN IF NOT EXISTS qty_to_invoice NUMERIC(18,2) DEFAULT 0,
+ADD COLUMN IF NOT EXISTS quantity_shipped NUMERIC(18,2) DEFAULT 0;
+
 WITH invoice_totals AS (
   SELECT
     psi.source_posted_sales_shipment_id AS posted_sales_shipment_id,

@@ -33,8 +33,8 @@ async function getNextNumber(seriesCode, lineId = null) {
          WHERE no_series_code = $1
            AND COALESCE(open, true) = true
          ORDER BY
-           COALESCE(sequence_no, id),
-           id
+           COALESCE(sequence_no, 2147483647),
+           id::text
          LIMIT 1
          FOR UPDATE`,
         [seriesCode]

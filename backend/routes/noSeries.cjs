@@ -376,8 +376,8 @@ router.get(
           FROM no_series_lines
           WHERE no_series_code = $1
           ORDER BY
-            COALESCE(sequence_no, id),
-            id
+            COALESCE(sequence_no, 2147483647),
+            id::text
           `,
           [code]
         );
@@ -467,8 +467,8 @@ router.get(
           sc.is_related,
           sc.code,
           CASE WHEN COALESCE(line.open, true) = true THEN 0 ELSE 1 END,
-          COALESCE(line.sequence_no, line.id),
-          line.id
+          COALESCE(line.sequence_no, 2147483647),
+          line.id::text
         `,
         [code]
       );
@@ -594,8 +594,8 @@ router.get(
           FROM no_series_lines
           WHERE no_series_code = related.code
           ORDER BY
-            COALESCE(sequence_no, id),
-            id
+            COALESCE(sequence_no, 2147483647),
+            id::text
           LIMIT 1
         ) line ON true
         WHERE rel.series_code = $1
@@ -841,8 +841,8 @@ router.post(
           WHERE no_series_code = $1
           AND COALESCE(open, true) = true
           ORDER BY
-            COALESCE(sequence_no, id),
-            id
+            COALESCE(sequence_no, 2147483647),
+            id::text
           LIMIT 1
           FOR UPDATE
           `,

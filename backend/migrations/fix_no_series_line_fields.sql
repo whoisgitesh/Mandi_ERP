@@ -16,6 +16,22 @@ ALTER TABLE public.no_series_lines
 UPDATE public.no_series_lines
 SET
   open = COALESCE(open, true),
-  allow_gaps = COALESCE(allow_gaps, false),
-  sequence_no = COALESCE(sequence_no, id)
-WHERE sequence_no IS NULL;
+  allow_gaps = COALESCE(allow_gaps, false);
+
+WITH numbered_lines AS (
+  SELECT
+    id,
+    ROW_NUMBER() OVER (
+      PARTITION BY no_series_code
+      ORDER BY
+        COALESCE(starting_date, DATE '1900-01-01'),
+        starting_no,
+        id::text
+    ) AS generated_sequence_no
+  FROM public.no_series_lines
+  WHERE sequence_no IS NULL
+)
+UPDATE public.no_series_lines line
+SET sequence_no = numbered_lines.generated_sequence_no
+FROM numbered_lines
+WHERE line.id = numbered_lines.id;
