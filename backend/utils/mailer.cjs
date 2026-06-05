@@ -60,6 +60,8 @@ async function sendWithResend(to, otp) {
     const body = await response.text();
     const error = new Error(`Resend email failed: ${response.status} ${body}`);
     error.code = "RESEND_ERROR";
+    error.responseCode = response.status;
+    error.responseBody = body;
     throw error;
   }
 }

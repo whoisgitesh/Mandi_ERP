@@ -360,10 +360,19 @@ export default function Auth() {
         toast.success("OTP sent");
         setMode("otp");
       } else {
+        const details =
+          typeof data.details === "string"
+            ? data.details
+            : data.details
+              ? JSON.stringify(data.details)
+              : "";
+
         toast.error(
-          data.code
-            ? `${data.error || "Failed to send OTP"} (${data.code})`
-            : data.error || "Failed to send OTP"
+          details
+            ? `${data.error || "Failed to send OTP"} ${details}`
+            : data.code
+              ? `${data.error || "Failed to send OTP"} (${data.code})`
+              : data.error || "Failed to send OTP"
         );
       }
     } catch {

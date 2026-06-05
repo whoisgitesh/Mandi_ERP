@@ -244,6 +244,14 @@ router.post("/send-otp", async (req, res) => {
       });
     }
 
+    if (err.code === "RESEND_ERROR") {
+      return res.status(500).json({
+        error: "Resend rejected the OTP email request.",
+        code: err.code,
+        details: err.responseBody || null,
+      });
+    }
+
     return res.status(500).json({
       error: "Failed to send OTP email.",
       code: err.code || err.command || err.responseCode || "SMTP_ERROR",
