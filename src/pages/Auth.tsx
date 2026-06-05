@@ -360,7 +360,11 @@ export default function Auth() {
         toast.success("OTP sent");
         setMode("otp");
       } else {
-        toast.error(data.error || "Failed to send OTP");
+        toast.error(
+          data.code
+            ? `${data.error || "Failed to send OTP"} (${data.code})`
+            : data.error || "Failed to send OTP"
+        );
       }
     } catch {
       toast.error("Server error");

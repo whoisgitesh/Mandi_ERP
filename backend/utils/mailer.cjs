@@ -4,7 +4,10 @@ const mailUser = process.env.SMTP_USER;
 const mailPass = process.env.SMTP_PASS
   ? process.env.SMTP_PASS.replace(/\s+/g, "")
   : "";
-const mailService = process.env.SMTP_SERVICE || "gmail";
+const smtpHost = process.env.SMTP_HOST || "smtp.gmail.com";
+const smtpPort = Number(process.env.SMTP_PORT || 465);
+const smtpSecure =
+  String(process.env.SMTP_SECURE || "true").toLowerCase() === "true";
 const mailFrom = process.env.MAIL_FROM || mailUser;
 
 if (!mailUser || !mailPass) {
@@ -14,7 +17,12 @@ if (!mailUser || !mailPass) {
 }
 
 const transporter = nodemailer.createTransport({
-  service: mailService,
+  host: smtpHost,
+  port: smtpPort,
+  secure: smtpSecure,
+  connectionTimeout: Number(process.env.SMTP_CONNECTION_TIMEOUT || 10000),
+  greetingTimeout: Number(process.env.SMTP_GREETING_TIMEOUT || 10000),
+  socketTimeout: Number(process.env.SMTP_SOCKET_TIMEOUT || 15000),
   auth: {
     user: mailUser,
     pass: mailPass,
